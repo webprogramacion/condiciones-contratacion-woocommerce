@@ -1,0 +1,95 @@
+name: Release
+
+# Al hacer push a main: si la versión del plugin no tiene release todavía,
+# se crea el tag vX.Y.Z, la release de GitHub y se adjunta el zip listo
+# para subir a WordPress.org.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Leer versión del plugin
+        id: version
+        run: |
+          FILE="condiciones-contratacion-woocommerce.php"
+          if [ ! -f "$FILE" ]; then
+            echo "El archivo principal del plugin aún no existe; no se crea release."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          VERSION=$(sed -n 's/.*Version:[[:space:]]*\([0-9][0-9A-Za-z.\-]*\).*/\1/p' "$FILE" | head -n1)
+          if [ -z "$VERSION" ]; then
+            echo "No se pudo leer la cabecera Version del plugin; no se crea release."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Versión detectada: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Comprobar si la release ya existe
+        id: check
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "La release $TAG ya existe; no se hace nada."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Construir el zip del plugin
+        id: build
+        if: steps.version.outputs.skip != 'true' && steps.check.outputs.exists == 'false'
+        run: |
+          SLUG="condiciones-contratacion-woocommerce"
+          VERSION="${{ steps.version.outputs.version }}"
+          ZIP="${SLUG}-${VERSION}.zip"
+          mkdir -p "build/$SLUG"
+          rsync -a --exclude-from=.distignore --exclude=build . "build/$SLUG/"
+          cd build
+          zip -rq "../$ZIP" "$SLUG"
+          cd ..
+          echo "Contenido del zip:"
+          unzip -l "$ZIP"
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Extraer notas del CHANGELOG
+        id: notes
+        if: steps.version.outputs.skip != 'true' && steps.check.outputs.exists == 'false'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if [ -f CHANGELOG.md ]; then
+            awk -v ver="$VERSION" '
+              /^## \[/ { p = (index($0, "[" ver "]") > 0) ; if (p) next }
+              p { print }
+            ' CHANGELOG.md > release-notes.md
+          fi
+          if [ ! -s release-notes.md ]; then
+            echo "Versión $VERSION." > release-notes.md
+          fi
+          cat release-notes.md
+
+      - name: Crear la release
+        if: steps.version.outputs.skip != 'true' && steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          gh release create "$TAG" "${{ steps.build.outputs.zip }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Condiciones de contratación para WooCommerce ${{ steps.version.outputs.version }}" \
+            --notes-file release-notes.md

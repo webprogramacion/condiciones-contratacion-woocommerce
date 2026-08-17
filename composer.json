@@ -1,0 +1,26 @@
+{
+	"name": "damasovelazquez/condiciones-contratacion-woocommerce",
+	"description": "Casillas de aceptación de condiciones configurables en el checkout de WooCommerce.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"squizlabs/php_codesniffer": "^3.11",
+		"wp-coding-standards/wpcs": "^3.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"wp-cli/i18n-command": "^2.6"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"lint:fix": "phpcbf",
+		"make-pot": "wp i18n make-pot . languages/condiciones-contratacion-woocommerce.pot --exclude=vendor,node_modules,build,openspec"
+	}
+}

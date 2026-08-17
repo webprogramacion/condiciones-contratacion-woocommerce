@@ -1,0 +1,69 @@
+/**
+ * Estilos del repetidor de casillas en los ajustes.
+ *
+ * @package CondicionesContratacionWooCommerce
+ */
+
+.ccwoo-checkboxes {
+	margin-bottom: 1em;
+	max-width: 980px;
+}
+
+.ccwoo-checkboxes th,
+.ccwoo-checkboxes td {
+	vertical-align: top;
+	padding: 10px;
+}
+
+.ccwoo-checkboxes .ccwoo-col-handle {
+	width: 28px;
+	padding-right: 0;
+}
+
+.ccwoo-checkboxes .ccwoo-col-order {
+	width: 90px;
+}
+
+.ccwoo-checkboxes .ccwoo-col-required {
+	width: 140px;
+}
+
+.ccwoo-checkboxes .ccwoo-col-enabled,
+.ccwoo-checkboxes .ccwoo-col-actions {
+	width: 80px;
+	text-align: center;
+}
+
+.ccwoo-checkboxes .ccwoo-sort-handle {
+	cursor: move;
+	display: block;
+	width: 20px;
+	height: 20px;
+	color: #787c82;
+}
+
+.ccwoo-checkboxes .ccwoo-sort-handle::before {
+	content: "\f333";
+	font-family: dashicons, sans-serif;
+	font-size: 18px;
+	line-height: 20px;
+}
+
+.ccwoo-checkboxes .ccwoo-text {
+	min-height: 60px;
+	font-family: Consolas, Monaco, monospace;
+	font-size: 13px;
+}
+
+.ccwoo-checkboxes .ccwoo-remove-row {
+	color: #b32d2e;
+}
+
+.ccwoo-checkboxes tr.ccwoo-row.ui-sortable-helper {
+	background: #fff;
+	box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.2 );
+}
+
+.ccwoo-checkboxes .hidden {
+	display: none;
+}

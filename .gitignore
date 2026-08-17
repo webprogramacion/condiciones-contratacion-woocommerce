@@ -1,0 +1,12 @@
+# Dependencias
+/vendor/
+/node_modules/
+
+# Artefactos de build
+/build/
+*.zip
+
+# Entorno local
+.env
+.DS_Store
+Thumbs.db
