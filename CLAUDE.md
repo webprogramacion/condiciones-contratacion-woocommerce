@@ -9,6 +9,12 @@ Plugin de WordPress/WooCommerce (slug: `condiciones-contratacion-woocommerce`) q
 - Prefijo de clases y funciones: `CCWOO_` / `ccwoo_`.
 - Compatibilidad declarada con HPOS y checkout por bloques.
 
+## Depuración
+
+Guía completa en [docs/depuracion.md](docs/depuracion.md). El plugin registra en el sistema de registros de WooCommerce vía `CCWOO_Logger` (origen `condiciones-contratacion`): errores y advertencias siempre, mensajes informativos solo con `WP_DEBUG` o el filtro `ccwoo_enable_logging`. Los ajustes incluyen una sección «Diagnóstico» con el estado del entorno.
+
+Cuidado con las clases de WooCommerce que su autoloader no resuelve (`WC_Settings_Page` entre ellas): hay que cargar las clases que las extienden dentro del hook donde WooCommerce ya las ha incluido, nunca en `plugins_loaded`.
+
 ## Proceso de nueva versión
 
 Cuando el usuario pida publicar una nueva versión (p. ej. "saca la versión 1.2.0" o "prepara una nueva versión"):
@@ -26,6 +32,9 @@ Cuando el usuario pida publicar una nueva versión (p. ej. "saca la versión 1.2
 
 ## Empaquetado
 
+El contenido exacto del zip, qué se excluye y por qué, y el criterio sobre `vendor/` están en [docs/empaquetado.md](docs/empaquetado.md). Resumen:
+
 - El zip de distribución se construye en CI con `rsync --exclude-from=.distignore`; el contenido queda dentro de una carpeta raíz `condiciones-contratacion-woocommerce/` (requisito de WordPress.org).
-- Cualquier archivo de desarrollo nuevo (tests, configs, tooling) debe añadirse a `.distignore` para que no acabe en el zip.
+- `vendor/` **no** viaja en el zip: todas las dependencias de Composer son de desarrollo y el plugin no carga `vendor/autoload.php`. Si algún día se añade una dependencia de runtime, hay que revisar la sección correspondiente de `docs/empaquetado.md`.
+- Cualquier archivo de desarrollo nuevo (tests, configs, tooling, documentación) debe añadirse a `.distignore` en el mismo commit para que no acabe en el zip.
 - El workflow solo crea release si la versión de la cabecera del plugin no tiene ya un tag `vX.Y.Z`; un push sin cambio de versión no publica nada.

@@ -19,21 +19,49 @@
 	var plugins = wpNamespace.plugins;
 	var data = wpNamespace.data;
 
-	if ( ! blocksCheckout || ! blocksCheckout.ExperimentalOrderMeta || ! element || ! plugins || ! data ) {
-		return;
-	}
-
 	var settings = {};
 
 	if ( wcNamespace.wcSettings && 'function' === typeof wcNamespace.wcSettings.getSetting ) {
 		settings = wcNamespace.wcSettings.getSetting( 'ccwoo-terms_data', {} ) || {};
 	}
 
+	/**
+	 * Avisa por consola cuando la depuración está activa (WP_DEBUG o el filtro
+	 * ccwoo_enable_logging). Sirve para ver por qué no aparecen las casillas.
+	 *
+	 * @param {string} message Mensaje.
+	 */
+	function notice( message ) {
+		if ( settings.debug && window.console && window.console.warn ) {
+			window.console.warn( '[condiciones-contratacion] ' + message );
+		}
+	}
+
+	if ( ! element || ! plugins || ! data ) {
+		notice( 'faltan los paquetes de WordPress (wp.element, wp.plugins o wp.data): no se pintan las casillas.' );
+
+		return;
+	}
+
+	if ( ! blocksCheckout || ! blocksCheckout.ExperimentalOrderMeta ) {
+		notice( 'esta versión de WooCommerce no expone wc.blocksCheckout.ExperimentalOrderMeta: no se pintan las casillas en el checkout por bloques.' );
+
+		return;
+	}
+
 	var checkboxes = settings.checkboxes || [];
 
 	if ( ! checkboxes.length ) {
+		notice( 'no hay casillas activas configuradas: no hay nada que pintar.' );
+
 		return;
 	}
+
+	if ( 'function' !== typeof blocksCheckout.useCheckoutExtensionData ) {
+		notice( 'wc.blocksCheckout.useCheckoutExtensionData no está disponible; se usará el respaldo sobre el store wc/store/checkout.' );
+	}
+
+	notice( 'inicializando ' + checkboxes.length + ' casillas en el checkout por bloques.' );
 
 	var namespace = settings.namespace || 'ccwoo-terms';
 	var strings = settings.i18n || {};

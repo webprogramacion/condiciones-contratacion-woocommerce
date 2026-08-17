@@ -34,8 +34,12 @@ class CCWOO_Checkout_Classic {
 		$items = CCWOO_Checkboxes::get_active();
 
 		if ( empty( $items ) ) {
+			CCWOO_Logger::debug( 'Checkout clásico: no hay casillas activas que mostrar.' );
+
 			return;
 		}
+
+		CCWOO_Logger::debug( sprintf( 'Checkout clásico: se muestran %d casillas.', count( $items ) ) );
 
 		echo '<div class="ccwoo-terms">';
 
@@ -84,6 +88,10 @@ class CCWOO_Checkout_Classic {
 			}
 
 			if ( ! $this->is_submitted( CCWOO_Checkboxes::field_name( $item['id'] ) ) ) {
+				CCWOO_Logger::debug(
+					sprintf( 'Checkout clásico: casilla obligatoria sin aceptar (%s).', $item['id'] )
+				);
+
 				wc_add_notice(
 					sprintf(
 						/* translators: %s: texto de la condición que el cliente debe aceptar. */
@@ -111,6 +119,10 @@ class CCWOO_Checkout_Classic {
 				$accepted[] = $item['id'];
 			}
 		}
+
+		CCWOO_Logger::debug(
+			sprintf( 'Checkout clásico: se registran %d aceptaciones en el pedido.', count( $accepted ) )
+		);
 
 		CCWOO_Order_Acceptances::record( $order, $accepted );
 	}

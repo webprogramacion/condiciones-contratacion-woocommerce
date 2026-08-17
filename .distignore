@@ -8,6 +8,7 @@
 .codex
 .agent
 openspec
+docs
 node_modules
 vendor
 tests

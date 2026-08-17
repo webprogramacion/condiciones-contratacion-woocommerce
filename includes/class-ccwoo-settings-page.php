@@ -42,6 +42,7 @@ class CCWOO_Settings_Page extends WC_Settings_Page {
 		parent::__construct();
 
 		add_action( 'woocommerce_admin_field_ccwoo_checkboxes', array( $this, 'output_checkboxes_field' ) );
+		add_action( 'woocommerce_admin_field_ccwoo_diagnostics', array( $this, 'output_diagnostics_field' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
@@ -84,6 +85,20 @@ class CCWOO_Settings_Page extends WC_Settings_Page {
 			array(
 				'type' => 'sectionend',
 				'id'   => 'ccwoo_general_options',
+			),
+			array(
+				'title' => __( 'Diagnóstico', 'condiciones-contratacion-woocommerce' ),
+				'type'  => 'title',
+				'desc'  => __( 'Datos del entorno y de la configuración, útiles si algo no funciona como esperas.', 'condiciones-contratacion-woocommerce' ),
+				'id'    => 'ccwoo_diagnostics_options',
+			),
+			array(
+				'type'      => 'ccwoo_diagnostics',
+				'is_option' => false,
+			),
+			array(
+				'type' => 'sectionend',
+				'id'   => 'ccwoo_diagnostics_options',
 			),
 		);
 
@@ -226,6 +241,117 @@ class CCWOO_Settings_Page extends WC_Settings_Page {
 	}
 
 	/**
+	 * Imprime la tabla de diagnóstico.
+	 *
+	 * @return void
+	 */
+	public function output_diagnostics_field() {
+		$all      = CCWOO_Checkboxes::get_all();
+		$active   = CCWOO_Checkboxes::get_active();
+		$required = 0;
+
+		foreach ( $active as $item ) {
+			if ( $item['required'] ) {
+				++$required;
+			}
+		}
+
+		$rows = array(
+			__( 'Versión del plugin', 'condiciones-contratacion-woocommerce' )      => CCWOO_VERSION,
+			__( 'Versión de WooCommerce', 'condiciones-contratacion-woocommerce' )  => defined( 'WC_VERSION' ) ? WC_VERSION : __( 'desconocida', 'condiciones-contratacion-woocommerce' ),
+			__( 'Versión de WordPress', 'condiciones-contratacion-woocommerce' )    => get_bloginfo( 'version' ),
+			__( 'Versión de PHP', 'condiciones-contratacion-woocommerce' )          => PHP_VERSION,
+			__( 'HPOS (tablas de pedidos)', 'condiciones-contratacion-woocommerce' ) => $this->describe_bool( $this->is_hpos_enabled() ),
+			__( 'Checkout por bloques', 'condiciones-contratacion-woocommerce' )    => $this->describe_bool( $this->checkout_uses_blocks() ),
+			__( 'Casillas configuradas', 'condiciones-contratacion-woocommerce' )   => count( $all ),
+			__( 'Casillas activas', 'condiciones-contratacion-woocommerce' )        => count( $active ),
+			__( 'De ellas obligatorias', 'condiciones-contratacion-woocommerce' )   => $required,
+			__( 'Casilla genérica de WooCommerce', 'condiciones-contratacion-woocommerce' ) => CCWOO_Checkboxes::is_wc_terms_disabled()
+				? __( 'desactivada por este plugin', 'condiciones-contratacion-woocommerce' )
+				: __( 'activa', 'condiciones-contratacion-woocommerce' ),
+			__( 'Registro de depuración', 'condiciones-contratacion-woocommerce' )  => CCWOO_Logger::is_enabled()
+				? __( 'activo', 'condiciones-contratacion-woocommerce' )
+				: __( 'inactivo (actívalo con WP_DEBUG o el filtro ccwoo_enable_logging)', 'condiciones-contratacion-woocommerce' ),
+		);
+
+		?>
+		<tr valign="top">
+			<th scope="row" class="titledesc"><?php esc_html_e( 'Estado', 'condiciones-contratacion-woocommerce' ); ?></th>
+			<td class="forminp forminp-ccwoo_diagnostics">
+				<table class="widefat striped ccwoo-diagnostics">
+					<tbody>
+						<?php foreach ( $rows as $label => $value ) : ?>
+							<tr>
+								<th scope="row"><?php echo esc_html( $label ); ?></th>
+								<td><?php echo esc_html( $value ); ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				<p class="description">
+					<?php
+					printf(
+						/* translators: %s: ruta del menú de registros de WooCommerce. */
+						esc_html__( 'Los mensajes del plugin se registran en %s, con el origen «condiciones-contratacion».', 'condiciones-contratacion-woocommerce' ),
+						'<strong>' . esc_html__( 'WooCommerce → Estado → Registros', 'condiciones-contratacion-woocommerce' ) . '</strong>'
+					);
+					?>
+				</p>
+			</td>
+		</tr>
+		<?php
+	}
+
+	/**
+	 * Indica si HPOS está activo.
+	 *
+	 * @return bool
+	 */
+	protected function is_hpos_enabled() {
+		if ( ! class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' ) ) {
+			return false;
+		}
+
+		if ( ! method_exists( '\Automattic\WooCommerce\Utilities\OrderUtil', 'custom_orders_table_usage_is_enabled' ) ) {
+			return false;
+		}
+
+		return (bool) \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+	}
+
+	/**
+	 * Indica si la página de pago usa el checkout por bloques.
+	 *
+	 * @return bool
+	 */
+	protected function checkout_uses_blocks() {
+		if ( ! function_exists( 'wc_get_page_id' ) || ! function_exists( 'has_block' ) ) {
+			return false;
+		}
+
+		$page_id = wc_get_page_id( 'checkout' );
+
+		if ( $page_id <= 0 ) {
+			return false;
+		}
+
+		return has_block( 'woocommerce/checkout', $page_id );
+	}
+
+	/**
+	 * Convierte un booleano en texto legible.
+	 *
+	 * @param bool $value Valor.
+	 *
+	 * @return string
+	 */
+	protected function describe_bool( $value ) {
+		return $value
+			? __( 'sí', 'condiciones-contratacion-woocommerce' )
+			: __( 'no', 'condiciones-contratacion-woocommerce' );
+	}
+
+	/**
 	 * Guarda los ajustes de la pestaña.
 	 *
 	 * @return void
@@ -249,6 +375,8 @@ class CCWOO_Settings_Page extends WC_Settings_Page {
 		$nonce = isset( $_POST[ self::NONCE_NAME ] ) ? sanitize_text_field( wp_unslash( $_POST[ self::NONCE_NAME ] ) ) : '';
 
 		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+			CCWOO_Logger::warning( 'Guardado de casillas rechazado: nonce inválido o ausente.' );
+
 			WC_Admin_Settings::add_error( __( 'No se han podido guardar las casillas de aceptación: la comprobación de seguridad ha fallado. Recarga la página e inténtalo de nuevo.', 'condiciones-contratacion-woocommerce' ) );
 
 			return;
@@ -257,7 +385,9 @@ class CCWOO_Settings_Page extends WC_Settings_Page {
 		// Los valores se sanean fila a fila en CCWOO_Checkboxes::save().
 		$rows = isset( $_POST['ccwoo_checkbox'] ) ? wp_unslash( $_POST['ccwoo_checkbox'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-		CCWOO_Checkboxes::save( is_array( $rows ) ? $rows : array() );
+		$saved = CCWOO_Checkboxes::save( is_array( $rows ) ? $rows : array() );
+
+		CCWOO_Logger::debug( sprintf( 'Casillas guardadas: %d.', count( $saved ) ) );
 	}
 
 	/**

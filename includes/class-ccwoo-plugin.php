@@ -22,6 +22,13 @@ class CCWOO_Plugin {
 	protected static $instance = null;
 
 	/**
+	 * Mensaje del fallo de arranque, si lo ha habido.
+	 *
+	 * @var string
+	 */
+	protected $startup_error = '';
+
+	/**
 	 * Devuelve la instancia única del plugin.
 	 *
 	 * @return CCWOO_Plugin
@@ -49,14 +56,18 @@ class CCWOO_Plugin {
 	 * @return void
 	 */
 	protected function includes() {
+		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-logger.php';
 		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-checkboxes.php';
 		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-order-acceptances.php';
 		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-checkout-classic.php';
 		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-checkout-blocks.php';
 
-		if ( is_admin() ) {
-			require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-settings-page.php';
-		}
+		/*
+		 * La pestaña de ajustes NO se carga aquí: extiende WC_Settings_Page, una clase
+		 * que WooCommerce incluye a mano (no la resuelve su autoloader) justo antes de
+		 * disparar `woocommerce_get_settings_pages`. Cargarla en `plugins_loaded` haría
+		 * que la clase no llegara a definirse. Se carga en register_settings_page().
+		 */
 	}
 
 	/**
@@ -79,9 +90,38 @@ class CCWOO_Plugin {
 	 * @return void
 	 */
 	protected function init_components() {
-		new CCWOO_Order_Acceptances();
-		new CCWOO_Checkout_Classic();
-		new CCWOO_Checkout_Blocks();
+		try {
+			new CCWOO_Order_Acceptances();
+			new CCWOO_Checkout_Classic();
+			new CCWOO_Checkout_Blocks();
+
+			CCWOO_Logger::debug( 'Componentes inicializados correctamente.' );
+		} catch ( Throwable $exception ) {
+			// Un fallo aquí dejaría el sitio en blanco: se registra y se avisa en el admin.
+			CCWOO_Logger::exception( $exception, 'init_components' );
+
+			$this->startup_error = $exception->getMessage();
+
+			add_action( 'admin_notices', array( $this, 'startup_error_notice' ) );
+		}
+	}
+
+	/**
+	 * Avisa en el administrador de que el plugin no ha podido arrancar del todo.
+	 *
+	 * @return void
+	 */
+	public function startup_error_notice() {
+		if ( ! $this->startup_error || ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-error"><p><strong>%s</strong> %s</p><p><code>%s</code></p></div>',
+			esc_html__( 'Condiciones de contratación para WooCommerce:', 'condiciones-contratacion-woocommerce' ),
+			esc_html__( 'el plugin no ha podido arrancar correctamente. Tienes el detalle en WooCommerce → Estado → Registros.', 'condiciones-contratacion-woocommerce' ),
+			esc_html( $this->startup_error )
+		);
 	}
 
 	/**
@@ -101,7 +141,24 @@ class CCWOO_Plugin {
 	 * @return array
 	 */
 	public function register_settings_page( $pages ) {
+		// En este punto WooCommerce ya ha incluido WC_Settings_Page.
+		if ( ! class_exists( 'WC_Settings_Page' ) ) {
+			CCWOO_Logger::error( 'No se ha podido registrar la pestaña de ajustes: falta la clase WC_Settings_Page.' );
+
+			return $pages;
+		}
+
+		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-settings-page.php';
+
+		if ( ! class_exists( 'CCWOO_Settings_Page' ) ) {
+			CCWOO_Logger::error( 'No se ha podido registrar la pestaña de ajustes: la clase CCWOO_Settings_Page no se ha definido.' );
+
+			return $pages;
+		}
+
 		$pages[] = new CCWOO_Settings_Page();
+
+		CCWOO_Logger::debug( 'Pestaña de ajustes registrada.' );
 
 		return $pages;
 	}

@@ -40,12 +40,21 @@ class CCWOO_Checkout_Blocks {
 	 */
 	public function register_integration( $registry ) {
 		if ( ! interface_exists( '\Automattic\WooCommerce\Blocks\Integrations\IntegrationInterface' ) ) {
+			CCWOO_Logger::warning( 'Checkout por bloques: falta IntegrationInterface, no se registra la integración.' );
+
 			return;
 		}
 
-		require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-blocks-integration.php';
+		try {
+			require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-blocks-integration.php';
 
-		$registry->register( new CCWOO_Blocks_Integration() );
+			$registry->register( new CCWOO_Blocks_Integration() );
+
+			CCWOO_Logger::debug( 'Checkout por bloques: integración registrada.' );
+		} catch ( Throwable $exception ) {
+			// Un fallo aquí no debe tumbar el checkout: se registra y se sigue.
+			CCWOO_Logger::exception( $exception, 'register_integration' );
+		}
 	}
 
 	/**
@@ -119,6 +128,15 @@ class CCWOO_Checkout_Blocks {
 				$missing[] = wp_strip_all_tags( $item['text'] );
 			}
 		}
+
+		CCWOO_Logger::debug(
+			sprintf(
+				'Store API: %d aceptadas, %d obligatorias sin aceptar. Datos recibidos: %s.',
+				count( $accepted ),
+				count( $missing ),
+				empty( $data ) ? 'ninguno' : wp_json_encode( $data )
+			)
+		);
 
 		if ( ! empty( $missing ) ) {
 			throw new \Automattic\WooCommerce\StoreApi\Exceptions\RouteException(

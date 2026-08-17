@@ -63,6 +63,10 @@ Sí, hay una opción en los ajustes del plugin para desactivarla. Ten en cuenta 
 
 No tienen aceptaciones registradas y su ficha lo indica sin errores. El plugin solo registra las aceptaciones de los pedidos realizados desde su activación.
 
+= Algo no funciona, ¿dónde miro? =
+
+En **WooCommerce → Ajustes → Condiciones de contratación** hay una sección «Diagnóstico» con las versiones del entorno y el recuento de casillas activas. El plugin además escribe en **WooCommerce → Estado → Registros**, en el archivo con origen `condiciones-contratacion`. Para obtener información detallada, activa `WP_DEBUG` o añade el filtro `add_filter( 'ccwoo_enable_logging', '__return_true' );`.
+
 = ¿Se borran los datos al desinstalar? =
 
 Al desinstalar se eliminan las opciones de configuración. Las aceptaciones guardadas en los pedidos se conservan intencionadamente, porque son la evidencia de lo que el cliente aceptó en cada compra.

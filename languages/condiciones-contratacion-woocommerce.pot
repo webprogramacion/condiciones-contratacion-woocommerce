@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-17T14:50:39+00:00\n"
+"POT-Creation-Date: 2026-08-17T15:32:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: condiciones-contratacion-woocommerce\n"
@@ -55,26 +55,26 @@ msgstr ""
 
 #. translators: %s: texto de la condición que el cliente debe aceptar.
 #: includes/class-ccwoo-blocks-integration.php:78
-#: includes/class-ccwoo-checkout-classic.php:90
+#: includes/class-ccwoo-checkout-classic.php:98
 #, php-format
 msgid "Debes aceptar: %s"
 msgstr ""
 
-#: includes/class-ccwoo-blocks-integration.php:88
+#: includes/class-ccwoo-blocks-integration.php:89
 msgid "(obligatoria)"
 msgstr ""
 
-#: includes/class-ccwoo-checkout-blocks.php:83
+#: includes/class-ccwoo-checkout-blocks.php:92
 msgid "Aceptación de una de las condiciones de contratación."
 msgstr ""
 
 #. translators: %s: lista de condiciones que el cliente debe aceptar, separadas por comas.
-#: includes/class-ccwoo-checkout-blocks.php:128
+#: includes/class-ccwoo-checkout-blocks.php:146
 #, php-format
 msgid "Debes aceptar las siguientes condiciones: %s"
 msgstr ""
 
-#: includes/class-ccwoo-checkout-classic.php:65
+#: includes/class-ccwoo-checkout-classic.php:69
 msgid "Obligatorio"
 msgstr ""
 
@@ -109,6 +109,14 @@ msgid "Aceptada el %s"
 msgstr ""
 
 #: includes/class-ccwoo-plugin.php:121
+msgid "Condiciones de contratación para WooCommerce:"
+msgstr ""
+
+#: includes/class-ccwoo-plugin.php:122
+msgid "el plugin no ha podido arrancar correctamente. Tienes el detalle en WooCommerce → Estado → Registros."
+msgstr ""
+
+#: includes/class-ccwoo-plugin.php:178
 msgid "Ajustes"
 msgstr ""
 
@@ -116,91 +124,185 @@ msgstr ""
 msgid "Condiciones de contratación"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:56
+#: includes/class-ccwoo-settings-page.php:57
 msgid "Casillas de aceptación"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:58
+#: includes/class-ccwoo-settings-page.php:59
 msgid "Añade las casillas que el cliente verá en el checkout. Puedes reordenarlas arrastrándolas y decidir si cada una es obligatoria u opcional. En el texto se admiten enlaces y las etiquetas <code>&lt;strong&gt;</code>, <code>&lt;em&gt;</code> y <code>&lt;br&gt;</code>."
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:70
+#: includes/class-ccwoo-settings-page.php:73
 msgid "Aceptación genérica de WooCommerce"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:75
+#: includes/class-ccwoo-settings-page.php:78
 msgid "Casilla de WooCommerce"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:76
+#: includes/class-ccwoo-settings-page.php:79
 msgid "Desactivar la aceptación genérica de condiciones de WooCommerce"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:77
+#: includes/class-ccwoo-settings-page.php:80
 msgid "Oculta la casilla de «términos y condiciones» que WooCommerce muestra de serie en el checkout, para que solo se usen las casillas configuradas en este plugin."
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:119
+#: includes/class-ccwoo-settings-page.php:90
+msgid "Diagnóstico"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:92
+msgid "Datos del entorno y de la configuración, útiles si algo no funciona como esperas."
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:136
 msgid "Has desactivado la aceptación genérica de WooCommerce y no hay ninguna casilla obligatoria activa: el checkout no pedirá ninguna aceptación de condiciones."
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:134
+#: includes/class-ccwoo-settings-page.php:151
 msgid "Casillas"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:141
-#: includes/class-ccwoo-settings-page.php:142
+#: includes/class-ccwoo-settings-page.php:158
+#: includes/class-ccwoo-settings-page.php:159
 msgid "Orden"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:143
+#: includes/class-ccwoo-settings-page.php:160
 msgid "Texto de la casilla"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:144
+#: includes/class-ccwoo-settings-page.php:161
 msgid "Aceptación"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:145
+#: includes/class-ccwoo-settings-page.php:162
 msgid "Activa"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:146
+#: includes/class-ccwoo-settings-page.php:163
 msgid "Acciones"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:154
+#: includes/class-ccwoo-settings-page.php:171
 msgid "Todavía no has añadido ninguna casilla."
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:159
+#: includes/class-ccwoo-settings-page.php:176
 msgid "Añadir casilla"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:202
+#: includes/class-ccwoo-settings-page.php:219
 msgid "Acepto las <a href=\"/condiciones\">condiciones de contratación</a>"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:206
+#: includes/class-ccwoo-settings-page.php:223
 msgid "Obligatoria"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:207
+#: includes/class-ccwoo-settings-page.php:224
 msgid "Opcional"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:214
+#: includes/class-ccwoo-settings-page.php:231
 msgid "Mostrar esta casilla en el checkout"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:219
+#: includes/class-ccwoo-settings-page.php:236
 msgid "Eliminar"
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:250
+#: includes/class-ccwoo-settings-page.php:260
+msgid "Versión del plugin"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:261
+msgid "Versión de WooCommerce"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:261
+msgid "desconocida"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:262
+msgid "Versión de WordPress"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:263
+msgid "Versión de PHP"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:264
+msgid "HPOS (tablas de pedidos)"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:265
+msgid "Checkout por bloques"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:266
+msgid "Casillas configuradas"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:267
+msgid "Casillas activas"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:268
+msgid "De ellas obligatorias"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:269
+msgid "Casilla genérica de WooCommerce"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:270
+msgid "desactivada por este plugin"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:271
+msgid "activa"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:272
+msgid "Registro de depuración"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:273
+msgid "activo"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:274
+msgid "inactivo (actívalo con WP_DEBUG o el filtro ccwoo_enable_logging)"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:279
+msgid "Estado"
+msgstr ""
+
+#. translators: %s: ruta del menú de registros de WooCommerce.
+#: includes/class-ccwoo-settings-page.php:295
+#, php-format
+msgid "Los mensajes del plugin se registran en %s, con el origen «condiciones-contratacion»."
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:296
+msgid "WooCommerce → Estado → Registros"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:350
+msgid "sí"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:351
+msgid "no"
+msgstr ""
+
+#: includes/class-ccwoo-settings-page.php:380
 msgid "No se han podido guardar las casillas de aceptación: la comprobación de seguridad ha fallado. Recarga la página e inténtalo de nuevo."
 msgstr ""
 
-#: includes/class-ccwoo-settings-page.php:290
+#: includes/class-ccwoo-settings-page.php:422
 msgid "¿Seguro que quieres eliminar esta casilla?"
 msgstr ""

@@ -95,7 +95,17 @@ function ccwoo_requirements_notice() {
  * @return void
  */
 function ccwoo_bootstrap() {
+	require_once CCWOO_PLUGIN_DIR . 'includes/class-ccwoo-logger.php';
+
 	if ( ! ccwoo_is_woocommerce_supported() ) {
+		CCWOO_Logger::error(
+			sprintf(
+				'Requisitos no cumplidos: se necesita WooCommerce %s o superior. Detectado: %s.',
+				CCWOO_MIN_WC_VERSION,
+				defined( 'WC_VERSION' ) ? WC_VERSION : 'WooCommerce no activo'
+			)
+		);
+
 		add_action( 'admin_notices', 'ccwoo_requirements_notice' );
 
 		return;

@@ -83,6 +83,7 @@ class CCWOO_Blocks_Integration implements IntegrationInterface {
 
 		return array(
 			'namespace'  => CCWOO_Checkout_Blocks::EXTENSION_NAMESPACE,
+			'debug'      => CCWOO_Logger::is_enabled(),
 			'checkboxes' => $checkboxes,
 			'i18n'       => array(
 				'requiredMark' => __( '(obligatoria)', 'condiciones-contratacion-woocommerce' ),
