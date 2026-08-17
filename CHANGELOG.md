@@ -6,6 +6,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-17
+
 ### Fixed
 
 - Pantalla en blanco (error fatal `Class "CCWOO_Settings_Page" not found`) al abrir los ajustes de WooCommerce. La clase de la pestaña extiende `WC_Settings_Page`, que WooCommerce no resuelve con su autoloader, de modo que al cargarla en `plugins_loaded` nunca llegaba a definirse. Ahora se carga dentro de `register_settings_page()`, con doble comprobación para que no pueda provocar un fatal.

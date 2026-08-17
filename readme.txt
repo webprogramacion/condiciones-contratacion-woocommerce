@@ -6,7 +6,7 @@ Tested up to: 6.7
 Requires PHP: 7.4
 WC requires at least: 8.2
 WC tested up to: 9.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,14 @@ Al desinstalar se eliminan las opciones de configuración. Las aceptaciones guar
 
 == Changelog ==
 
+= 1.1.0 =
+* Corregida la pantalla en blanco (error fatal `Class "CCWOO_Settings_Page" not found`) al abrir los ajustes de WooCommerce.
+* Añadido el registro de eventos en WooCommerce → Estado → Registros, con origen `condiciones-contratacion`.
+* Añadida la sección «Diagnóstico» en los ajustes con el estado del entorno y el recuento de casillas.
+* Añadidos avisos por consola en el checkout por bloques cuando falta alguna API de WooCommerce Blocks o no hay casillas que pintar.
+* Añadida la guía de depuración en `docs/depuracion.md`.
+* Un fallo al inicializar los componentes ya no deja el sitio en blanco: se captura, se registra y se avisa en el administrador.
+
 = 1.0.0 =
 * Versión inicial.
 * Pestaña de ajustes «Condiciones de contratación» dentro de WooCommerce.
@@ -88,6 +96,9 @@ Al desinstalar se eliminan las opciones de configuración. Las aceptaciones guar
 * Registro de las aceptaciones en el pedido y panel de consulta en el administrador, compatible con HPOS.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Corrige la pantalla en blanco al abrir los ajustes de WooCommerce y añade registro de eventos y diagnóstico. Actualización recomendada.
 
 = 1.0.0 =
 Primera versión del plugin.
