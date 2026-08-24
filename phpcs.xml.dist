@@ -2,7 +2,7 @@
 <ruleset name="Condiciones de contratación para WooCommerce">
 	<description>WordPress Coding Standards aplicados al plugin.</description>
 
-	<file>.</file>
+	<file>condiciones-contratacion-woocommerce</file>
 
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>

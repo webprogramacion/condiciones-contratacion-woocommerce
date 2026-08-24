@@ -33,7 +33,8 @@ class CCWOO_Order_Acceptances {
 	 *
 	 * Se almacena el texto vigente en el momento de la compra, de forma que los
 	 * pedidos antiguos conserven lo que el cliente aceptó aunque el texto cambie
-	 * después.
+	 * después. De cada casilla aceptada se guarda además la fecha y la IP desde
+	 * la que se aceptó, como evidencia del consentimiento.
 	 *
 	 * @param WC_Order $order        Pedido en creación.
 	 * @param array    $accepted_ids Identificadores de las casillas aceptadas.
@@ -53,6 +54,7 @@ class CCWOO_Order_Acceptances {
 
 		$accepted_ids = array_map( 'strval', (array) $accepted_ids );
 		$timestamp    = current_time( 'mysql', true );
+		$ip           = self::get_client_ip();
 		$records      = array();
 
 		foreach ( $items as $item ) {
@@ -64,10 +66,33 @@ class CCWOO_Order_Acceptances {
 				'required' => $item['required'] ? 1 : 0,
 				'accepted' => $accepted ? 1 : 0,
 				'date'     => $accepted ? $timestamp : '',
+				'ip'       => $accepted ? $ip : '',
 			);
 		}
 
 		$order->update_meta_data( self::META_KEY, $records );
+	}
+
+	/**
+	 * Obtiene la IP desde la que se realiza la compra.
+	 *
+	 * Se usa la utilidad de WooCommerce, que ya tiene en cuenta las cabeceras de
+	 * los proxies y CDN habituales. La dirección se valida antes de guardarla.
+	 *
+	 * @return string IP del cliente, o cadena vacía si no se ha podido determinar.
+	 */
+	protected static function get_client_ip() {
+		if ( class_exists( 'WC_Geolocation' ) ) {
+			$ip = WC_Geolocation::get_ip_address();
+		} elseif ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		} else {
+			$ip = '';
+		}
+
+		$ip = filter_var( $ip, FILTER_VALIDATE_IP );
+
+		return $ip ? $ip : '';
 	}
 
 	/**
@@ -137,6 +162,7 @@ class CCWOO_Order_Acceptances {
 			$required = ! empty( $record['required'] );
 			$text     = isset( $record['text'] ) ? $record['text'] : '';
 			$date     = ! empty( $record['date'] ) ? get_date_from_gmt( $record['date'], $date_format ) : '';
+			$ip       = ! empty( $record['ip'] ) ? $record['ip'] : '';
 
 			echo '<li style="margin-bottom:1em;">';
 
@@ -156,15 +182,31 @@ class CCWOO_Order_Acceptances {
 
 			echo wp_kses( $text, CCWOO_Checkboxes::allowed_html() );
 
-			if ( $date ) {
-				printf(
-					'<br /><small>%s</small>',
-					sprintf(
-						/* translators: %s: fecha y hora de la aceptación. */
-						esc_html__( 'Aceptada el %s', 'condiciones-contratacion-woocommerce' ),
-						esc_html( $date )
-					)
+			$evidence = '';
+
+			if ( $date && $ip ) {
+				$evidence = sprintf(
+					/* translators: 1: fecha y hora de la aceptación. 2: dirección IP desde la que se aceptó. */
+					__( 'Aceptada el %1$s desde la IP %2$s', 'condiciones-contratacion-woocommerce' ),
+					$date,
+					$ip
 				);
+			} elseif ( $date ) {
+				$evidence = sprintf(
+					/* translators: %s: fecha y hora de la aceptación. */
+					__( 'Aceptada el %s', 'condiciones-contratacion-woocommerce' ),
+					$date
+				);
+			} elseif ( $ip ) {
+				$evidence = sprintf(
+					/* translators: %s: dirección IP desde la que se aceptó. */
+					__( 'Aceptada desde la IP %s', 'condiciones-contratacion-woocommerce' ),
+					$ip
+				);
+			}
+
+			if ( $evidence ) {
+				printf( '<br /><small>%s</small>', esc_html( $evidence ) );
 			}
 
 			echo '</li>';

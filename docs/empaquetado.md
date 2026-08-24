@@ -2,6 +2,12 @@
 
 Regla de oro: **el zip lleva solo lo que se ejecuta en la tienda del cliente**. Todo lo demás (herramientas, planificación, configuración de desarrollo) se queda fuera.
 
+## Cómo se garantiza: un directorio con lo distribuible
+
+Todo lo que viaja en el zip vive dentro del directorio [`condiciones-contratacion-woocommerce/`](../condiciones-contratacion-woocommerce/) del repositorio, que se llama exactamente igual que el slug del plugin. Fuera de él solo hay herramientas, documentación, planificación y configuración de CI.
+
+Esa separación hace innecesaria cualquier lista de exclusiones: el zip se construye comprimiendo ese directorio tal cual, así que **lo que está dentro se distribuye y lo que está fuera, no**. Como el directorio ya tiene el nombre que WordPress espera (`wp-content/plugins/<slug>/`), también sirve para implantar a mano: basta copiarlo o sincronizarlo al servidor sin filtrar nada.
+
 ## Contenido exacto del zip
 
 El archivo comprimido debe contener **una única carpeta raíz llamada igual que el slug del plugin** y, dentro, estos 17 archivos:
@@ -32,7 +38,11 @@ condiciones-contratacion-woocommerce/
     └── condiciones-contratacion-woocommerce.pot
 ```
 
-Si la carpeta raíz no se llama exactamente `condiciones-contratacion-woocommerce`, WordPress instalará el plugin en un directorio equivocado y el revisor de WordPress.org lo rechazará.
+Si la carpeta raíz no se llama exactamente `condiciones-contratacion-woocommerce`, WordPress instalará el plugin en un directorio equivocado y el revisor de WordPress.org lo rechazará. Por eso el directorio del repositorio ya se llama así: la carpeta raíz del zip es ese mismo directorio, sin renombrados por medio.
+
+### `LICENSE` está duplicada a propósito
+
+Hay dos copias idénticas: `LICENSE` en la raíz del repositorio y `condiciones-contratacion-woocommerce/LICENSE`. GitHub solo detecta la licencia del proyecto si está en la raíz, y el zip debe llevar la suya dentro. Se descartó resolverlo con un enlace simbólico (los zips y los checkouts en Windows los tratan mal) y con una copia hecha en CI durante el build (reintroduciría el paso de ensamblado que este esquema elimina). Son 35 KB que cambian una vez por década: si alguna vez se toca el archivo, hay que actualizar **las dos** copias.
 
 ## ¿Hay que meter `vendor/`? No
 
@@ -50,12 +60,12 @@ Si algún día este plugin necesita una **librería en tiempo de ejecución** (p
 
 1. Esa librería va en `require`, no en `require-dev`.
 2. El zip debe incluir `vendor/`, generado con `composer install --no-dev --optimize-autoloader` (WordPress.org no ejecuta Composer al instalar: lo que no vaya en el zip, no existe).
-3. Hay que quitar `vendor` de `.distignore` y añadir `require_once CCWOO_PLUGIN_DIR . 'vendor/autoload.php';` en el archivo principal.
+3. El `vendor/` de runtime tiene que quedar **dentro** de `condiciones-contratacion-woocommerce/` para que entre en el zip, y hay que añadir `require_once CCWOO_PLUGIN_DIR . 'vendor/autoload.php';` en el archivo principal. Ojo: el `vendor/` de desarrollo que crea `composer install` en la raíz del repositorio es otro y debe seguir fuera.
 4. Conviene renombrar el espacio de nombres de la librería (con PHP-Scoper o Mozart) para que no choque con otro plugin que incluya la misma librería en otra versión, que es una fuente clásica de fallos fatales en WordPress.
 
 ## Qué se queda fuera y por qué
 
-Lo controla [`.distignore`](../.distignore):
+Queda fuera todo lo que vive en la raíz del repositorio, es decir, todo lo que no está dentro de `condiciones-contratacion-woocommerce/`:
 
 | Fuera del zip | Motivo |
 |---|---|
@@ -65,8 +75,11 @@ Lo controla [`.distignore`](../.distignore):
 | `openspec/` | Planificación del cambio (propuesta, diseño, specs, tareas) |
 | `docs/`, `CHANGELOG.md`, `CLAUDE.md` | Documentación interna del repositorio |
 | `.claude/`, `.codex/`, `.agent/` | Configuración de herramientas locales |
-| `.git/`, `.gitignore`, `.gitattributes`, `.distignore` | Metadatos del repositorio |
+| `.git/`, `.gitignore`, `.gitattributes` | Metadatos del repositorio |
 | `node_modules/`, `tests/`, `build/`, `*.zip` | Artefactos y dependencias generadas |
+| `LICENSE` (la de la raíz) | Es la copia para GitHub; el zip lleva la del directorio del plugin |
+
+Antes esta lista se mantenía a mano en un archivo `.distignore` que el workflow pasaba a `rsync`. Ese archivo ya no existe: cada entrada de la tabla queda fuera por estar en la raíz, no por figurar en una lista.
 
 El changelog no viaja en el zip porque WordPress.org lee el suyo de la sección `== Changelog ==` de `readme.txt`. `CHANGELOG.md` es para quien lee el repositorio en GitHub; hay que mantener **los dos**.
 
@@ -76,33 +89,42 @@ Solo se incluye el `.pot`. No hace falta añadir `.po` ni `.mo` de cada idioma: 
 
 ## Cómo se genera el zip
 
-**Automáticamente (lo normal).** Al hacer push a `main`, el workflow [`.github/workflows/release.yml`](../.github/workflows/release.yml) lee la versión de la cabecera del plugin y, si esa versión aún no tiene release, construye el zip aplicando `.distignore` y lo adjunta a una release `vX.Y.Z`. Ese es el archivo que se sube a WordPress.org.
+**Automáticamente (lo normal).** Al hacer push a `main`, el workflow [`.github/workflows/release.yml`](../.github/workflows/release.yml) lee la versión de la cabecera del plugin y, si esa versión aún no tiene release, comprime el directorio `condiciones-contratacion-woocommerce/` y adjunta el zip a una release `vX.Y.Z`. Ese archivo se puede descargar de la release e instalar tal cual: sirve igual para subirlo a WordPress.org que para instalarlo desde **Plugins → Añadir nuevo → Subir plugin** en el administrador de WordPress. El propio workflow imprime el contenido del zip con `unzip -l`, que es la comprobación de que no se ha colado nada.
 
-**A mano**, si quieres inspeccionarlo antes (PowerShell, desde la raíz del repositorio):
+**A mano**, si quieres inspeccionarlo antes. Desde la raíz del repositorio, en PowerShell:
 
 ```powershell
 $slug = 'condiciones-contratacion-woocommerce'
-$version = '1.0.0'
-Remove-Item -Recurse -Force build, "$slug-$version.zip" -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force "build\$slug" | Out-Null
-Copy-Item condiciones-contratacion-woocommerce.php, uninstall.php, readme.txt, LICENSE "build\$slug"
-Copy-Item -Recurse assets, includes, languages "build\$slug"
-Compress-Archive -Path "build\$slug" -DestinationPath "$slug-$version.zip" -Force
+$version = '1.1.0'
+Remove-Item -Force "$slug-$version.zip" -ErrorAction SilentlyContinue
+Compress-Archive -Path $slug -DestinationPath "$slug-$version.zip"
 ```
 
-Este comando parte de una lista blanca (copia lo que debe ir) mientras que el workflow parte de una lista negra (excluye `.distignore`). Ambos deben producir el mismo árbol; si difieren, es que se ha añadido un archivo nuevo y falta actualizar uno de los dos.
+O en bash, exactamente lo que hace el workflow:
+
+```bash
+slug=condiciones-contratacion-woocommerce
+version=1.1.0
+rm -f "$slug-$version.zip"
+zip -rq "$slug-$version.zip" "$slug"
+unzip -l "$slug-$version.zip"
+```
+
+Ya no hay dos criterios que mantener sincronizados: tanto el workflow como el comando manual comprimen el mismo directorio, así que producen el mismo árbol por construcción.
 
 ## Antes de subir: comprobaciones
 
-1. La versión coincide en los tres sitios: cabecera `Version:` del archivo principal, constante `CCWOO_VERSION` y `Stable tag:` de `readme.txt`.
+1. La versión coincide en los tres sitios: cabecera `Version:` de `condiciones-contratacion-woocommerce/condiciones-contratacion-woocommerce.php`, constante `CCWOO_VERSION` en ese mismo archivo y `Stable tag:` de `condiciones-contratacion-woocommerce/readme.txt`.
 2. `readme.txt` tiene la entrada de la versión en `== Changelog ==`, y `CHANGELOG.md` también.
 3. `Tested up to:` y `WC tested up to:` reflejan las versiones con las que realmente has probado.
 4. `Contributors:` es tu usuario real de WordPress.org.
-5. `php vendor\bin\phpcs` no devuelve hallazgos.
-6. Si se han tocado cadenas traducibles, el `.pot` está regenerado:
-   `php vendor\wp-cli\wp-cli\php\boot-fs.php i18n make-pot . languages\condiciones-contratacion-woocommerce.pot --domain=condiciones-contratacion-woocommerce --exclude=vendor,node_modules,build,openspec,.github,.claude,.codex,.agent`
+5. `composer lint` (o `php vendor\bin\phpcs`) no devuelve hallazgos.
+6. Si se han tocado cadenas traducibles, el `.pot` está regenerado con `composer make-pot`, que equivale a:
+   `wp i18n make-pot condiciones-contratacion-woocommerce condiciones-contratacion-woocommerce\languages\condiciones-contratacion-woocommerce.pot`
 7. Descomprime el zip y confirma que la carpeta raíz es `condiciones-contratacion-woocommerce`, que dentro está `readme.txt` y que **no** hay `vendor/`, `openspec/`, `.github/` ni `composer.json`.
 
 ## Mantenimiento
 
-Cada vez que se añada un archivo o carpeta de desarrollo al repositorio (tests, configuración de herramientas, documentación, scripts de build), hay que añadirlo a `.distignore` en el mismo commit. Si no, acabará dentro del zip que se publica.
+La regla es una sola: **nada de desarrollo se crea dentro de `condiciones-contratacion-woocommerce/`**. Tests, configuración de herramientas, documentación y scripts de build van en la raíz del repositorio o en sus propios directorios, y con eso quedan fuera del zip sin tocar ninguna lista.
+
+Es más difícil de incumplir que el esquema anterior, porque el error se ve en el árbol del repositorio en lugar de esconderse en un archivo de exclusiones desactualizado. Y si aun así se cuela algo, el `unzip -l` del log del workflow lo enseña en cada release.

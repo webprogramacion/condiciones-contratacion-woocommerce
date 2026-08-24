@@ -21,7 +21,7 @@ jobs:
       - name: Leer versión del plugin
         id: version
         run: |
-          FILE="condiciones-contratacion-woocommerce.php"
+          FILE="condiciones-contratacion-woocommerce/condiciones-contratacion-woocommerce.php"
           if [ ! -f "$FILE" ]; then
             echo "El archivo principal del plugin aún no existe; no se crea release."
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -57,11 +57,10 @@ jobs:
           SLUG="condiciones-contratacion-woocommerce"
           VERSION="${{ steps.version.outputs.version }}"
           ZIP="${SLUG}-${VERSION}.zip"
-          mkdir -p "build/$SLUG"
-          rsync -a --exclude-from=.distignore --exclude=build . "build/$SLUG/"
-          cd build
-          zip -rq "../$ZIP" "$SLUG"
-          cd ..
+          # El directorio del plugin ya tiene el nombre y el contenido exactos que
+          # espera WordPress, así que se comprime tal cual: el zip queda con la
+          # carpeta raíz correcta y sin nada de desarrollo dentro.
+          zip -rq "$ZIP" "$SLUG"
           echo "Contenido del zip:"
           unzip -l "$ZIP"
           echo "zip=$ZIP" >> "$GITHUB_OUTPUT"

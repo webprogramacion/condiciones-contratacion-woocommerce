@@ -21,6 +21,6 @@
 	"scripts": {
 		"lint": "phpcs",
 		"lint:fix": "phpcbf",
-		"make-pot": "wp i18n make-pot . languages/condiciones-contratacion-woocommerce.pot --exclude=vendor,node_modules,build,openspec"
+		"make-pot": "wp i18n make-pot condiciones-contratacion-woocommerce condiciones-contratacion-woocommerce/languages/condiciones-contratacion-woocommerce.pot"
 	}
 }

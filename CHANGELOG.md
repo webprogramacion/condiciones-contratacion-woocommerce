@@ -6,6 +6,15 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+### Added
+
+- La dirección IP desde la que el cliente acepta cada condición se guarda en el pedido y se muestra junto a la fecha en el metabox «Condiciones aceptadas» del administrador. Solo se registra en las casillas que se han marcado; los pedidos anteriores siguen mostrando únicamente la fecha.
+
+### Changed
+
+- Todo el código que se distribuye pasa a vivir en el directorio `condiciones-contratacion-woocommerce/` del repositorio, con el mismo nombre que el slug del plugin. Así una implantación manual es copiar esa carpeta a `wp-content/plugins/`, y el zip de la release de GitHub se puede instalar directamente en WordPress o subir a WordPress.org sin repaquetizar. No hay ningún cambio de comportamiento en la tienda.
+- El zip de distribución se construye comprimiendo ese directorio en lugar de filtrar la raíz del repositorio con una lista de exclusiones. `.distignore` se elimina: ya no hay lista que mantener, basta con no crear archivos de desarrollo dentro del directorio del plugin.
+
 ## [1.1.0] - 2026-08-17
 
 ### Fixed

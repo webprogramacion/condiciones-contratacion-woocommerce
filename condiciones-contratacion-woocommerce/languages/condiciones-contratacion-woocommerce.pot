@@ -78,34 +78,46 @@ msgstr ""
 msgid "Obligatorio"
 msgstr ""
 
-#: includes/class-ccwoo-order-acceptances.php:98
+#: includes/class-ccwoo-order-acceptances.php:123
 msgid "Condiciones aceptadas"
 msgstr ""
 
-#: includes/class-ccwoo-order-acceptances.php:125
+#: includes/class-ccwoo-order-acceptances.php:150
 msgid "Este pedido no tiene aceptaciones de condiciones registradas."
 msgstr ""
 
-#: includes/class-ccwoo-order-acceptances.php:146
+#: includes/class-ccwoo-order-acceptances.php:172
 msgid "Aceptada"
 msgstr ""
 
-#: includes/class-ccwoo-order-acceptances.php:147
+#: includes/class-ccwoo-order-acceptances.php:173
 msgid "No aceptada"
 msgstr ""
 
-#: includes/class-ccwoo-order-acceptances.php:153
+#: includes/class-ccwoo-order-acceptances.php:179
 msgid "obligatoria"
 msgstr ""
 
-#: includes/class-ccwoo-order-acceptances.php:154
+#: includes/class-ccwoo-order-acceptances.php:180
 msgid "opcional"
 msgstr ""
 
+#. translators: 1: fecha y hora de la aceptación. 2: dirección IP desde la que se aceptó.
+#: includes/class-ccwoo-order-acceptances.php:190
+#, php-format
+msgid "Aceptada el %1$s desde la IP %2$s"
+msgstr ""
+
 #. translators: %s: fecha y hora de la aceptación.
-#: includes/class-ccwoo-order-acceptances.php:164
+#: includes/class-ccwoo-order-acceptances.php:197
 #, php-format
 msgid "Aceptada el %s"
+msgstr ""
+
+#. translators: %s: dirección IP desde la que se aceptó.
+#: includes/class-ccwoo-order-acceptances.php:203
+#, php-format
+msgid "Aceptada desde la IP %s"
 msgstr ""
 
 #: includes/class-ccwoo-plugin.php:121
