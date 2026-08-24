@@ -24,5 +24,5 @@
 ## 5. Verificación de conjunto
 
 - [x] 5.1 Simular el workflow completo en local (lectura de versión + build del zip + extracción de notas) y descomprimir el zip en un directorio temporal comprobando: carpeta raíz exacta `condiciones-contratacion-woocommerce/`, `readme.txt` presente, `.pot` presente, ausencia de archivos de desarrollo.
-- [ ] 5.2 `git log --follow condiciones-contratacion-woocommerce/includes/class-ccwoo-plugin.php` muestra el historial anterior al movimiento (los renames conservan historial).
-- [ ] 5.3 Tras el push a `main`, revisar en GitHub Actions que el workflow acaba sin error y sin crear release (la versión 1.1.0 ya tiene tag), y que el paso de versión detecta `1.1.0` con la nueva ruta.
+- [x] 5.2 `git log --follow condiciones-contratacion-woocommerce/includes/class-ccwoo-plugin.php` muestra el historial anterior al movimiento (los renames conservan historial).
+- [x] 5.3 Tras el push a `main`, revisar en GitHub Actions que el workflow acaba sin error y sin crear release (la versión 1.1.0 ya tiene tag), y que el paso de versión detecta `1.1.0` con la nueva ruta.

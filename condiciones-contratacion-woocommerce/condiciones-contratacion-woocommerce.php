@@ -3,7 +3,7 @@
  * Plugin Name:          Condiciones de contratación para WooCommerce
  * Plugin URI:           https://github.com/damasovelazquez/condiciones-contratacion-woocommerce
  * Description:          Añade al checkout de WooCommerce tantas casillas de aceptación de condiciones como necesites, con texto propio, orden configurable y carácter obligatorio u opcional.
- * Version:              1.1.0
+ * Version:              1.2.0
  * Requires at least:    6.5
  * Requires PHP:         7.4
  * Author:               Dámaso Velázquez
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CCWOO_VERSION', '1.1.0' );
+define( 'CCWOO_VERSION', '1.2.0' );
 define( 'CCWOO_PLUGIN_FILE', __FILE__ );
 define( 'CCWOO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CCWOO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

@@ -6,6 +6,8 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-24
+
 ### Added
 
 - La dirección IP desde la que el cliente acepta cada condición se guarda en el pedido y se muestra junto a la fecha en el metabox «Condiciones aceptadas» del administrador. Solo se registra en las casillas que se han marcado; los pedidos anteriores siguen mostrando únicamente la fecha.
